@@ -1,13 +1,14 @@
 /**
- * Workshop DIY — Template
+ * Workshop DIY — Crypto Vault
  * Themes · i18n (en/fr/ar) · RTL · Log · Toast · Status
+ * Password strength · Drag-and-drop · Smart mode toggle
  */
 
 const $ = id => document.getElementById(id);
+const APP_VERSION = '1.1';
 
 /* ═══════ LOGO (injected once) ═══════ */
 
-// Uses your provided logo asset if present.
 const LOGO_HTML = `<img src="logo-web.svg" alt="Workshop DIY" loading="eager" decoding="async" />`;
 
 /* ═══════ i18n ═══════ */
@@ -31,13 +32,13 @@ const LANG = {
     decryptInputHelp: 'Paste the encrypted blob or load a .json file.',
     decryptOutputHelp: 'Decrypted text will appear here, or you can download the file.',
     decryptWarn: 'Wrong password or corrupted data will fail safely.',
-    adviceDo: 'Do', adviceDont: 'Don’t',
+    adviceDo: 'Do', adviceDont: 'Don\'t',
     do1: 'Use a long, unique password (12+ characters; longer is better).',
     do2: 'Treat the encrypted blob like a secret file — store it safely.',
     do3: 'If you encrypt a file, keep the filename somewhere if you need it later.',
-    dont1: 'Don’t reuse passwords across important data.',
-    dont2: 'Don’t share passwords in the same channel as the encrypted blob.',
-    dont3: 'Don’t rely on clipboard for highly sensitive secrets (apps/extensions may read it).',
+    dont1: 'Don\'t reuse passwords across important data.',
+    dont2: 'Don\'t share passwords in the same channel as the encrypted blob.',
+    dont3: 'Don\'t rely on clipboard for highly sensitive secrets (apps/extensions may read it).',
     adviceNote: 'All crypto happens locally in your browser using Web Crypto (AES‑GCM + PBKDF2). No network calls.',
     activityLog: 'Activity Log', eventsMsg: 'Events & messages',
     clear: 'Clear', copy: 'Copy', theme: 'Theme',
@@ -55,6 +56,20 @@ const LANG = {
     badBlob: 'Invalid encrypted blob format.',
     decFail: 'Wrong password or corrupted data.',
     webcryptoMissing: 'Web Crypto not available in this browser.',
+    toastEncrypting: 'Encrypting…',
+    toastEncryptingFile: 'Encrypting file…',
+    toastDecrypting: 'Decrypting…',
+    dropFileHere: 'Drop file here',
+    dropOrBrowse: 'Drag & drop a file, or click to browse',
+    fileSelected: 'Selected:',
+    outputTooltip: 'This is a JSON blob containing the encrypted data, salt, IV, and parameters. You need this blob + your password to decrypt.',
+    strengthWeak: 'Weak',
+    strengthFair: 'Fair',
+    strengthGood: 'Good',
+    strengthStrong: 'Strong',
+    strengthExcellent: 'Excellent',
+    passMismatchHint: 'Passwords don\'t match',
+    passMatchHint: 'Passwords match ✓',
   },
   fr: {
     title: 'Coffre Crypto', subtitle: '🔐 chiffrer · 🔓 déchiffrer · 🧠 conseils',
@@ -75,12 +90,12 @@ const LANG = {
     decryptOutputHelp: 'Le texte déchiffré apparaît ici, ou téléchargez le fichier.',
     decryptWarn: 'Mot de passe faux ou données corrompues : échec sûr.',
     adviceDo: 'À faire', adviceDont: 'À éviter',
-    do1: 'Utilisez un mot de passe long et unique (12+ caractères ; plus c’est long mieux c’est).',
+    do1: 'Utilisez un mot de passe long et unique (12+ caractères ; plus c\'est long mieux c\'est).',
     do2: 'Traitez le bloc chiffré comme un secret — stockez-le en sécurité.',
     do3: 'Si vous chiffrez un fichier, gardez son nom si vous en avez besoin plus tard.',
     dont1: 'Ne réutilisez pas les mots de passe pour des données importantes.',
     dont2: 'Ne partagez pas le mot de passe dans le même canal que le bloc chiffré.',
-    dont3: 'N’utilisez pas le presse-papiers pour des secrets très sensibles (apps/extensions peuvent le lire).',
+    dont3: 'N\'utilisez pas le presse-papiers pour des secrets très sensibles (apps/extensions peuvent le lire).',
     adviceNote: 'Tout se fait localement via Web Crypto (AES‑GCM + PBKDF2). Aucun appel réseau.',
     activityLog: 'Journal', eventsMsg: 'Événements et messages',
     clear: 'Effacer', copy: 'Copier', theme: 'Thème',
@@ -98,6 +113,20 @@ const LANG = {
     badBlob: 'Format de bloc chiffré invalide.',
     decFail: 'Mot de passe faux ou données corrompues.',
     webcryptoMissing: 'Web Crypto indisponible dans ce navigateur.',
+    toastEncrypting: 'Chiffrement…',
+    toastEncryptingFile: 'Chiffrement du fichier…',
+    toastDecrypting: 'Déchiffrement…',
+    dropFileHere: 'Déposez le fichier ici',
+    dropOrBrowse: 'Glissez-déposez un fichier, ou cliquez pour parcourir',
+    fileSelected: 'Sélectionné :',
+    outputTooltip: 'Ce blob JSON contient les données chiffrées, le sel, l\'IV et les paramètres. Vous avez besoin de ce blob + votre mot de passe pour déchiffrer.',
+    strengthWeak: 'Faible',
+    strengthFair: 'Passable',
+    strengthGood: 'Bon',
+    strengthStrong: 'Fort',
+    strengthExcellent: 'Excellent',
+    passMismatchHint: 'Les mots de passe ne correspondent pas',
+    passMatchHint: 'Mots de passe identiques ✓',
   },
   ar: {
     title: 'الخزنة المشفّرة', subtitle: '🔐 تشفير · 🔓 فك التشفير · 🧠 نصائح',
@@ -141,6 +170,20 @@ const LANG = {
     badBlob: 'صيغة الكتلة المشفّرة غير صحيحة.',
     decFail: 'كلمة مرور خاطئة أو بيانات تالفة.',
     webcryptoMissing: 'Web Crypto غير متوفر في هذا المتصفح.',
+    toastEncrypting: 'جارٍ التشفير…',
+    toastEncryptingFile: 'جارٍ تشفير الملف…',
+    toastDecrypting: 'جارٍ فك التشفير…',
+    dropFileHere: 'أسقط الملف هنا',
+    dropOrBrowse: 'اسحب وأسقط ملفاً، أو انقر للتصفح',
+    fileSelected: 'المحدد:',
+    outputTooltip: 'هذا الـ JSON يحتوي البيانات المشفّرة والملح والـ IV والمعلمات. تحتاج هذا + كلمة المرور لفك التشفير.',
+    strengthWeak: 'ضعيفة',
+    strengthFair: 'مقبولة',
+    strengthGood: 'جيدة',
+    strengthStrong: 'قوية',
+    strengthExcellent: 'ممتازة',
+    passMismatchHint: 'كلمتا المرور غير متطابقتين',
+    passMatchHint: 'كلمتا المرور متطابقتان ✓',
   }
 };
 
@@ -154,16 +197,23 @@ function setLanguage(lang) {
     const k = el.dataset.i18n;
     if (s[k] != null) el.textContent = s[k];
   });
-  // Update theme dropdown labels
   document.querySelectorAll('[data-i18n-opt]').forEach(opt => {
     const k = opt.dataset.i18nOpt;
     if (s[k] != null) opt.textContent = s[k];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const k = el.dataset.i18nPlaceholder;
+    if (s[k] != null) el.placeholder = s[k];
   });
   document.title = `${s.title} — Workshop DIY`;
   document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
   document.documentElement.lang = lang;
   const sel = $('langSelect');
   if (sel) sel.value = lang;
+  document.querySelectorAll('.version-tag').forEach(el => el.textContent = `v${APP_VERSION}`);
+  document.querySelectorAll('.drop-label').forEach(el => el.textContent = s.dropOrBrowse);
+  updateStrengthMeter($('encPass')?.value || '');
+  checkPassMatch();
   log(s.langChanged, 'info');
 }
 
@@ -219,12 +269,69 @@ function setStatus(connected) {
   if (pill) pill.classList.toggle('connected', connected);
 }
 
+/* ═══════ PASSWORD STRENGTH METER ═══════ */
+
+function calcPasswordStrength(pw) {
+  if (!pw) return { score: 0, level: 'none' };
+  let score = 0;
+  if (pw.length >= 8) score += 1;
+  if (pw.length >= 12) score += 1;
+  if (pw.length >= 16) score += 1;
+  if (pw.length >= 24) score += 1;
+  if (/[a-z]/.test(pw)) score += 1;
+  if (/[A-Z]/.test(pw)) score += 1;
+  if (/[0-9]/.test(pw)) score += 1;
+  if (/[^a-zA-Z0-9]/.test(pw)) score += 1;
+  if (/^(.)\1+$/.test(pw)) score = Math.max(score - 3, 0);
+  if (/^(012|123|234|345|456|567|678|789|abc|bcd|cde|def)/.test(pw.toLowerCase())) score = Math.max(score - 1, 0);
+  if (score <= 2) return { score: 1, level: 'weak' };
+  if (score <= 4) return { score: 2, level: 'fair' };
+  if (score <= 5) return { score: 3, level: 'good' };
+  if (score <= 6) return { score: 4, level: 'strong' };
+  return { score: 5, level: 'excellent' };
+}
+
+function updateStrengthMeter(pw) {
+  const bar = $('strengthBar');
+  const label = $('strengthLabel');
+  const container = $('strengthMeter');
+  if (!bar || !label || !container) return;
+  if (!pw) { container.classList.add('hidden'); return; }
+  container.classList.remove('hidden');
+  const { score, level } = calcPasswordStrength(pw);
+  const s = LANG[currentLang];
+  const levelKey = 'strength' + level.charAt(0).toUpperCase() + level.slice(1);
+  bar.dataset.level = level;
+  bar.style.width = (score / 5 * 100) + '%';
+  label.textContent = s[levelKey] || level;
+  label.dataset.level = level;
+}
+
+/* ═══════ PASSWORD MATCH CHECK ═══════ */
+
+function checkPassMatch() {
+  const p1 = $('encPass')?.value || '';
+  const p2 = $('encPass2')?.value || '';
+  const hint = $('passMatchHint');
+  if (!hint) return;
+  if (!p2) { hint.classList.add('hidden'); return; }
+  hint.classList.remove('hidden');
+  const s = LANG[currentLang];
+  if (p1 === p2) {
+    hint.textContent = s.passMatchHint;
+    hint.dataset.status = 'match';
+  } else {
+    hint.textContent = s.passMismatchHint;
+    hint.dataset.status = 'mismatch';
+  }
+}
+
 /* ═══════ CRYPTO VAULT (AES‑GCM + PBKDF2) ═══════ */
 
 const CRYPTO_V = 1;
-const PBKDF2_ITER = 310000;
+const PBKDF2_ITER = 600000;
 const SALT_LEN = 16;
-const IV_LEN = 12; // AES‑GCM recommended
+const IV_LEN = 12;
 
 const te = new TextEncoder();
 const td = new TextDecoder();
@@ -249,21 +356,9 @@ function randBytes(n) {
 }
 
 async function deriveAesKeyFromPassword(password, salt, iter = PBKDF2_ITER) {
-  const baseKey = await crypto.subtle.importKey(
-    'raw',
-    te.encode(password),
-    'PBKDF2',
-    false,
-    ['deriveKey']
-  );
-
+  const baseKey = await crypto.subtle.importKey('raw', te.encode(password), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey(
-    {
-      name: 'PBKDF2',
-      salt,
-      iterations: iter,
-      hash: 'SHA-256'
-    },
+    { name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' },
     baseKey,
     { name: 'AES-GCM', length: 256 },
     false,
@@ -271,9 +366,7 @@ async function deriveAesKeyFromPassword(password, salt, iter = PBKDF2_ITER) {
   );
 }
 
-function makeBlob(obj) {
-  return JSON.stringify(obj);
-}
+function makeBlob(obj) { return JSON.stringify(obj); }
 
 function parseBlob(text) {
   const t = (text || '').trim();
@@ -291,11 +384,8 @@ function downloadText(filename, text) {
   const blob = new Blob([text], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
@@ -303,11 +393,8 @@ function downloadBytes(filename, bytes) {
   const blob = new Blob([bytes], { type: 'application/octet-stream' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
@@ -320,17 +407,90 @@ async function copyText(text) {
   }
 }
 
+/* ═══════ MODE TOGGLE (improved: hide/show) ═══════ */
+
 function setMode(prefix, mode) {
-  const input = $(prefix + 'Input');
-  const file = $(prefix + 'File');
+  const textGroup = $(`${prefix}TextGroup`);
+  const fileGroup = $(`${prefix}FileGroup`);
   if (mode === 'file') {
-    if (input) { input.disabled = true; input.placeholder = ''; }
-    if (file) file.disabled = false;
+    if (textGroup) textGroup.classList.add('hidden');
+    if (fileGroup) fileGroup.classList.remove('hidden');
   } else {
-    if (input) { input.disabled = false; }
-    if (file) file.disabled = true;
+    if (textGroup) textGroup.classList.remove('hidden');
+    if (fileGroup) fileGroup.classList.add('hidden');
   }
 }
+
+/* ═══════ DRAG & DROP ═══════ */
+
+function initDropZone(dropId, fileInputId, modeSelectId, prefix) {
+  const zone = $(dropId);
+  const fileInput = $(fileInputId);
+  const modeSelect = $(modeSelectId);
+  if (!zone || !fileInput) return;
+
+  const fileInfo = zone.querySelector('.drop-file-info');
+
+  function showFileInfo(file) {
+    if (!fileInfo) return;
+    const s = LANG[currentLang];
+    const sizeKB = (file.size / 1024).toFixed(1);
+    fileInfo.textContent = `${s.fileSelected} ${file.name} (${sizeKB} KB)`;
+    fileInfo.classList.remove('hidden');
+  }
+
+  zone.addEventListener('click', (e) => {
+    if (e.target === fileInput) return;
+    fileInput.click();
+  });
+
+  zone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    zone.classList.add('drop-active');
+  });
+
+  zone.addEventListener('dragleave', () => {
+    zone.classList.remove('drop-active');
+  });
+
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    zone.classList.remove('drop-active');
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      fileInput.files = files;
+      if (modeSelect) { modeSelect.value = 'file'; setMode(prefix, 'file'); }
+      showFileInfo(files[0]);
+    }
+  });
+
+  fileInput.addEventListener('change', () => {
+    const f = fileInput.files?.[0];
+    if (f) {
+      if (modeSelect) { modeSelect.value = 'file'; setMode(prefix, 'file'); }
+      showFileInfo(f);
+    }
+  });
+}
+
+/* ═══════ OUTPUT TOOLTIP ═══════ */
+
+function initTooltips() {
+  document.querySelectorAll('.info-tooltip-trigger').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const tip = trigger.querySelector('.info-tooltip-body');
+      if (tip) tip.classList.toggle('visible');
+    });
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.info-tooltip-body.visible').forEach(tip => {
+      tip.classList.remove('visible');
+    });
+  });
+}
+
+/* ═══════ ENCRYPT / DECRYPT ═══════ */
 
 async function handleEncrypt() {
   const s = LANG[currentLang];
@@ -339,7 +499,6 @@ async function handleEncrypt() {
   const pass2 = $('encPass2')?.value || '';
   const encOut = $('encOut');
   if (encOut) encOut.value = '';
-
   if (!pass) return log(s.passRequired, 'error');
   if (pass !== pass2) return log(s.passMismatch, 'error');
 
@@ -358,26 +517,18 @@ async function handleEncrypt() {
     meta = { type: 'text' };
   }
 
-  showToast(mode === 'file' ? 'Encrypting file…' : 'Encrypting…');
+  showToast(mode === 'file' ? s.toastEncryptingFile : s.toastEncrypting);
   try {
     const salt = randBytes(SALT_LEN);
     const iv = randBytes(IV_LEN);
     const key = await deriveAesKeyFromPassword(pass, salt, PBKDF2_ITER);
     const ctBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, payloadBytes);
     const ct = new Uint8Array(ctBuf);
-
     const blobObj = {
-      v: CRYPTO_V,
-      alg: 'AES-GCM',
-      kdf: 'PBKDF2',
-      hash: 'SHA-256',
-      iter: PBKDF2_ITER,
-      salt: bytesToB64(salt),
-      iv: bytesToB64(iv),
-      ct: bytesToB64(ct),
-      meta
+      v: CRYPTO_V, alg: 'AES-GCM', kdf: 'PBKDF2', hash: 'SHA-256',
+      iter: PBKDF2_ITER, salt: bytesToB64(salt), iv: bytesToB64(iv),
+      ct: bytesToB64(ct), meta
     };
-
     const outText = makeBlob(blobObj);
     if (encOut) encOut.value = outText;
     log(s.encOk, 'tx');
@@ -386,6 +537,7 @@ async function handleEncrypt() {
     log('Encrypt failed', 'error');
   } finally {
     hideToast();
+    payloadBytes = null;
   }
 }
 
@@ -407,21 +559,18 @@ async function handleDecrypt() {
     if (!blobText.trim()) return log(s.missingInput, 'error');
   }
 
-  showToast('Decrypting…');
+  showToast(s.toastDecrypting);
   try {
     const obj = parseBlob(blobText);
     const salt = b64ToBytes(obj.salt);
     const iv = b64ToBytes(obj.iv);
     const ct = b64ToBytes(obj.ct);
     const iter = Number(obj.iter || PBKDF2_ITER);
-
     const key = await deriveAesKeyFromPassword(pass, salt, iter);
     const ptBuf = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, ct);
     const pt = new Uint8Array(ptBuf);
-
     const meta = obj.meta || { type: 'text' };
     if (meta.type === 'file') {
-      // For files we show a friendly note + allow download.
       if (decOut) decOut.value = `${meta.name || 'file'} (${pt.length} bytes)`;
       $('decDownload').dataset.bin = bytesToB64(pt);
       $('decDownload').dataset.filename = meta.name || 'decrypted.bin';
@@ -436,7 +585,6 @@ async function handleDecrypt() {
     log(s.decOk, 'rx');
   } catch (e) {
     console.error(e);
-    // Distinguish parse vs decrypt
     if (String(e?.message || '').includes('Unexpected') || String(e?.message || '') === 'empty') {
       log(s.badBlob, 'error');
     } else {
@@ -448,7 +596,6 @@ async function handleDecrypt() {
 }
 
 function initCryptoUI() {
-  // Mode toggles
   const encMode = $('encMode');
   const decMode = $('decMode');
   if (encMode) {
@@ -459,6 +606,17 @@ function initCryptoUI() {
     decMode.addEventListener('change', () => setMode('dec', decMode.value));
     setMode('dec', decMode.value);
   }
+
+  // Password strength meter
+  const encPass = $('encPass');
+  if (encPass) {
+    encPass.addEventListener('input', () => {
+      updateStrengthMeter(encPass.value);
+      checkPassMatch();
+    });
+  }
+  const encPass2 = $('encPass2');
+  if (encPass2) encPass2.addEventListener('input', checkPassMatch);
 
   // Show password toggles
   const encShow = $('encShow');
@@ -491,14 +649,12 @@ function initCryptoUI() {
     if (!out.trim()) return;
     downloadText('encrypted.json', out);
   });
-
   const decDl = $('decDownload');
   if (decDl) decDl.addEventListener('click', () => {
     const bin = decDl.dataset.bin || '';
     const name = decDl.dataset.filename || 'decrypted.txt';
     if (bin) {
-      const bytes = b64ToBytes(bin);
-      downloadBytes(name, bytes);
+      downloadBytes(name, b64ToBytes(bin));
     } else {
       const text = $('decOut')?.value || '';
       if (!text.trim()) return;
@@ -506,34 +662,32 @@ function initCryptoUI() {
     }
   });
 
-  // If user selects a file, auto switch to file mode
-  const ef = $('encFile');
-  if (ef) ef.addEventListener('change', () => { if (encMode) { encMode.value = 'file'; setMode('enc', 'file'); } });
-  const df = $('decFile');
-  if (df) df.addEventListener('change', () => { if (decMode) { decMode.value = 'file'; setMode('dec', 'file'); } });
+  // Drag & drop zones
+  initDropZone('encDropZone', 'encFile', 'encMode', 'enc');
+  initDropZone('decDropZone', 'decFile', 'decMode', 'dec');
 }
 
 /* ═══════ INIT ═══════ */
 
 function init() {
-  // Inject logo
   const lw = $('logoWrap');
   if (lw) lw.innerHTML = LOGO_HTML;
 
-  // Log buttons
+  document.querySelectorAll('.version-tag').forEach(el => el.textContent = `v${APP_VERSION}`);
+
   const cb = $('clearLogBtn'), cpb = $('copyLogBtn');
   if (cb) cb.onclick = clearLog;
   if (cpb) cpb.onclick = copyLog;
 
-  // Language dropdown
   const langSel = $('langSelect');
   if (langSel) langSel.addEventListener('change', () => setLanguage(langSel.value));
 
-  // Theme dropdown
   const themeSel = $('themeSelect');
   if (themeSel) themeSel.addEventListener('change', () => setTheme(themeSel.value));
 
   initCryptoUI();
+  initTooltips();
+
   const cryptoOk = !!(window.crypto && window.crypto.subtle);
   setStatus(cryptoOk);
   if (!cryptoOk) log(LANG[currentLang].webcryptoMissing, 'error');

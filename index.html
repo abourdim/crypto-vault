@@ -60,7 +60,7 @@
         <div class="card-header">
           <div>
             <div class="card-title"><span class="icon">🔐</span> <span data-i18n="encrypt">Encrypt</span></div>
-            <div class="card-subtitle"><span data-i18n="encryptDesc">Encrypt text or files locally in your browser</span> <span class="version-tag">v1.0</span></div>
+            <div class="card-subtitle"><span data-i18n="encryptDesc">Encrypt text or files locally in your browser</span> <span class="version-tag">v1.1</span></div>
           </div>
         </div>
 
@@ -71,25 +71,33 @@
               <div class="section-subtitle" data-i18n="encryptInputHelp">Choose text or file to encrypt.</div>
             </div>
 
-            <div class="grid-2">
-              <div>
-                <label class="ctrl-label" for="encMode" data-i18n="mode">Mode</label>
-                <select id="encMode" class="select-ctrl" aria-label="Encrypt mode">
-                  <option value="text" data-i18n-opt="modeText">Text</option>
-                  <option value="file" data-i18n-opt="modeFile">File</option>
-                </select>
-              </div>
-              <div>
-                <label class="ctrl-label" for="encFile" data-i18n="file">File</label>
-                <input id="encFile" type="file" class="file-ctrl" />
-                <div class="hint" data-i18n="fileHint">Used only if Mode = File</div>
+            <!-- Mode selector -->
+            <div style="margin-bottom: 10px;">
+              <label class="ctrl-label" for="encMode" data-i18n="mode">Mode</label>
+              <select id="encMode" class="select-ctrl" style="max-width: 180px;" aria-label="Encrypt mode">
+                <option value="text" data-i18n-opt="modeText">Text</option>
+                <option value="file" data-i18n-opt="modeFile">File</option>
+              </select>
+            </div>
+
+            <!-- TEXT mode group -->
+            <div id="encTextGroup">
+              <label class="ctrl-label" for="encInput" data-i18n="plaintext">Plaintext</label>
+              <textarea id="encInput" class="textarea" rows="6" placeholder="Type your text…"></textarea>
+            </div>
+
+            <!-- FILE mode group (hidden by default) -->
+            <div id="encFileGroup" class="hidden">
+              <div class="drop-zone" id="encDropZone">
+                <div class="drop-icon">📁</div>
+                <span class="drop-label" data-i18n="dropOrBrowse">Drag & drop a file, or click to browse</span>
+                <div class="drop-file-info hidden"></div>
+                <input id="encFile" type="file" />
               </div>
             </div>
 
-            <label class="ctrl-label" for="encInput" data-i18n="plaintext">Plaintext</label>
-            <textarea id="encInput" class="textarea" rows="6" placeholder="Type your text…"></textarea>
-
-            <div class="grid-2" style="margin-top:10px;">
+            <!-- Password -->
+            <div class="grid-2" style="margin-top: 10px;">
               <div>
                 <label class="ctrl-label" for="encPass" data-i18n="password">Password</label>
                 <input id="encPass" type="password" class="text-ctrl" autocomplete="new-password" />
@@ -100,24 +108,42 @@
               </div>
             </div>
 
-            <div class="row-actions" style="margin-top:10px;">
+            <!-- Password strength meter -->
+            <div class="strength-meter hidden" id="strengthMeter">
+              <div class="strength-track">
+                <div class="strength-bar" id="strengthBar"></div>
+              </div>
+              <span class="strength-label" id="strengthLabel"></span>
+            </div>
+
+            <!-- Password match hint -->
+            <div class="pass-match-hint hidden" id="passMatchHint"></div>
+
+            <div class="row-actions" style="margin-top: 10px;">
               <label class="toggle-ctrl"><input id="encShow" type="checkbox" class="checkbox-ctrl" /> <span data-i18n="showPassword">Show password</span></label>
               <div class="spacer"></div>
               <button id="encBtn" class="primary"><span class="btn-icon">🔐</span><span data-i18n="encryptBtn">Encrypt</span></button>
             </div>
           </div>
 
-          <div class="control-section" style="margin-top:12px;">
+          <div class="control-section" style="margin-top: 12px;">
             <div class="section-header">
-              <div class="section-title"><span class="icon">📦</span> <span data-i18n="output">Output</span></div>
+              <div class="section-title">
+                <span class="icon">📦</span>
+                <span data-i18n="output">Output</span>
+                <span class="info-tooltip-trigger">
+                  <span class="info-icon">?</span>
+                  <span class="info-tooltip-body" data-i18n="outputTooltip">This is a JSON blob containing the encrypted data, salt, IV, and parameters. You need this blob + your password to decrypt.</span>
+                </span>
+              </div>
               <div class="section-subtitle" data-i18n="encryptOutputHelp">This blob contains everything needed to decrypt (salt, iv, parameters).</div>
             </div>
             <textarea id="encOut" class="textarea" rows="7" readonly placeholder="Encrypted output will appear here…"></textarea>
-            <div class="row-actions" style="margin-top:10px;">
+            <div class="row-actions" style="margin-top: 10px;">
               <button id="encCopy" class="btn-sm"><span class="btn-icon">📋</span><span data-i18n="copy">Copy</span></button>
               <button id="encDownload" class="btn-sm"><span class="btn-icon">⬇️</span><span data-i18n="download">Download</span></button>
               <div class="spacer"></div>
-              <span class="badge" id="encMeta">AES‑GCM · PBKDF2</span>
+              <span class="badge" id="encMeta">AES‑GCM · PBKDF2 · <strong>600k</strong></span>
             </div>
           </div>
         </div>
@@ -141,25 +167,32 @@
                 <div class="section-subtitle" data-i18n="decryptInputHelp">Paste the encrypted blob or load a .json file.</div>
               </div>
 
-              <div class="grid-2">
-                <div>
-                  <label class="ctrl-label" for="decMode" data-i18n="mode">Mode</label>
-                  <select id="decMode" class="select-ctrl" aria-label="Decrypt mode">
-                    <option value="text" data-i18n-opt="modeText">Text</option>
-                    <option value="file" data-i18n-opt="modeFile">File</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="ctrl-label" for="decFile" data-i18n="file">File</label>
-                  <input id="decFile" type="file" class="file-ctrl" />
-                  <div class="hint" data-i18n="fileHint">Used only if Mode = File</div>
+              <!-- Mode selector -->
+              <div style="margin-bottom: 10px;">
+                <label class="ctrl-label" for="decMode" data-i18n="mode">Mode</label>
+                <select id="decMode" class="select-ctrl" style="max-width: 180px;" aria-label="Decrypt mode">
+                  <option value="text" data-i18n-opt="modeText">Text</option>
+                  <option value="file" data-i18n-opt="modeFile">File</option>
+                </select>
+              </div>
+
+              <!-- TEXT mode group -->
+              <div id="decTextGroup">
+                <label class="ctrl-label" for="decInput" data-i18n="ciphertext">Encrypted blob</label>
+                <textarea id="decInput" class="textarea" rows="7" placeholder="Paste the encrypted JSON here…"></textarea>
+              </div>
+
+              <!-- FILE mode group (hidden by default) -->
+              <div id="decFileGroup" class="hidden">
+                <div class="drop-zone" id="decDropZone">
+                  <div class="drop-icon">📁</div>
+                  <span class="drop-label" data-i18n="dropOrBrowse">Drag & drop a file, or click to browse</span>
+                  <div class="drop-file-info hidden"></div>
+                  <input id="decFile" type="file" />
                 </div>
               </div>
 
-              <label class="ctrl-label" for="decInput" data-i18n="ciphertext">Encrypted blob</label>
-              <textarea id="decInput" class="textarea" rows="7" placeholder="Paste the encrypted JSON here…"></textarea>
-
-              <div class="grid-2" style="margin-top:10px;">
+              <div class="grid-2" style="margin-top: 10px;">
                 <div>
                   <label class="ctrl-label" for="decPass" data-i18n="password">Password</label>
                   <input id="decPass" type="password" class="text-ctrl" autocomplete="current-password" />
@@ -170,20 +203,20 @@
                 </div>
               </div>
 
-              <div class="row-actions" style="margin-top:10px;">
+              <div class="row-actions" style="margin-top: 10px;">
                 <button id="decBtn" class="primary"><span class="btn-icon">🔓</span><span data-i18n="decryptBtn">Decrypt</span></button>
                 <div class="spacer"></div>
                 <span class="hint" id="decHint" data-i18n="decryptWarn">Wrong password or corrupted data will fail safely.</span>
               </div>
             </div>
 
-            <div class="control-section" style="margin-top:12px;">
+            <div class="control-section" style="margin-top: 12px;">
               <div class="section-header">
                 <div class="section-title"><span class="icon">🧾</span> <span data-i18n="output">Output</span></div>
                 <div class="section-subtitle" data-i18n="decryptOutputHelp">Decrypted text will appear here, or you can download the file.</div>
               </div>
               <textarea id="decOut" class="textarea" rows="6" readonly placeholder="Decrypted output will appear here…"></textarea>
-              <div class="row-actions" style="margin-top:10px;">
+              <div class="row-actions" style="margin-top: 10px;">
                 <button id="decCopy" class="btn-sm"><span class="btn-icon">📋</span><span data-i18n="copy">Copy</span></button>
                 <button id="decDownload" class="btn-sm"><span class="btn-icon">⬇️</span><span data-i18n="download">Download</span></button>
                 <div class="spacer"></div>
@@ -213,12 +246,12 @@
                 <li data-i18n="do3">If you encrypt a file, keep the filename somewhere if you need it later.</li>
               </ul>
             </div>
-            <div class="control-section" style="margin-top:12px;">
-              <div class="section-title"><span class="icon">⚠️</span> <span data-i18n="adviceDont">Don’t</span></div>
+            <div class="control-section" style="margin-top: 12px;">
+              <div class="section-title"><span class="icon">⚠️</span> <span data-i18n="adviceDont">Don't</span></div>
               <ul class="bullets">
-                <li data-i18n="dont1">Don’t reuse passwords across important data.</li>
-                <li data-i18n="dont2">Don’t share passwords in the same channel as the encrypted blob.</li>
-                <li data-i18n="dont3">Don’t rely on clipboard for highly sensitive secrets (apps/extensions may read it).</li>
+                <li data-i18n="dont1">Don't reuse passwords across important data.</li>
+                <li data-i18n="dont2">Don't share passwords in the same channel as the encrypted blob.</li>
+                <li data-i18n="dont3">Don't rely on clipboard for highly sensitive secrets (apps/extensions may read it).</li>
               </ul>
               <div class="hint" data-i18n="adviceNote">All crypto happens locally in your browser using Web Crypto (AES‑GCM + PBKDF2). No network calls.</div>
             </div>
@@ -240,7 +273,7 @@
           <div class="log" id="logContainer" aria-live="polite"></div>
           <div class="log-footer">
             <span>Workshop DIY</span>
-            <span class="badge"><strong>v1.0</strong></span>
+            <span class="badge"><strong class="version-tag">v1.1</strong></span>
           </div>
         </div>
       </details>

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   WORKSHOP DIY — Multi-Theme Template
+   WORKSHOP DIY — Multi-Theme Template v1.1
    6 themes via [data-theme] on <html>
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -141,6 +141,9 @@ body {
 }
 
 [dir="rtl"] { font-family: 'Tajawal', 'Amiri', sans-serif; }
+
+/* ═══════ Utility ═══════ */
+.hidden { display: none !important; }
 
 /* ═══════════════════════════════════════════════════════════════════
    APP SHELL
@@ -385,7 +388,6 @@ input[type="text"] {
   padding: 8px 12px; font-size: .8rem; font-family: var(--font-b); flex: 1;
 }
 
-/* Text/password/file controls used by the crypto app */
 .text-ctrl {
   width: 100%;
   border-radius: 999px;
@@ -464,6 +466,182 @@ input[type="text"] {
 .section-subtitle{ font-size: .74rem; color: var(--text-muted); margin-top: 2px; }
 
 .hint { font-size: .74rem; color: var(--text-muted); margin-top: 3px; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PASSWORD STRENGTH METER
+   ═══════════════════════════════════════════════════════════════════ */
+
+.strength-meter {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.strength-track {
+  flex: 1;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  overflow: hidden;
+}
+
+.strength-bar {
+  height: 100%;
+  border-radius: 999px;
+  width: 0%;
+  transition: width .35s ease, background .35s ease;
+}
+
+.strength-bar[data-level="weak"]      { background: #ef4444; }
+.strength-bar[data-level="fair"]      { background: #f97316; }
+.strength-bar[data-level="good"]      { background: #eab308; }
+.strength-bar[data-level="strong"]    { background: #22c55e; }
+.strength-bar[data-level="excellent"] { background: linear-gradient(90deg, #22c55e, #06b6d4); }
+
+.strength-label {
+  font-size: .68rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  min-width: 60px;
+  text-align: end;
+  transition: color .35s ease;
+}
+
+.strength-label[data-level="weak"]      { color: #ef4444; }
+.strength-label[data-level="fair"]      { color: #f97316; }
+.strength-label[data-level="good"]      { color: #eab308; }
+.strength-label[data-level="strong"]    { color: #22c55e; }
+.strength-label[data-level="excellent"] { color: #06b6d4; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PASSWORD MATCH HINT
+   ═══════════════════════════════════════════════════════════════════ */
+
+.pass-match-hint {
+  font-size: .72rem;
+  font-weight: 500;
+  margin-top: 4px;
+  transition: color .2s;
+}
+
+.pass-match-hint[data-status="match"]    { color: #22c55e; }
+.pass-match-hint[data-status="mismatch"] { color: #f87171; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DROP ZONE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.drop-zone {
+  border: 2px dashed var(--border);
+  border-radius: 12px;
+  padding: 18px 14px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .25s ease;
+  background: rgba(0,0,0,.15);
+  position: relative;
+}
+
+.drop-zone:hover {
+  border-color: var(--accent);
+  background: rgba(0,0,0,.25);
+}
+
+.drop-zone.drop-active {
+  border-color: var(--accent);
+  background: var(--glow);
+  box-shadow: 0 0 20px var(--glow);
+}
+
+.drop-zone .drop-icon {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+  opacity: .6;
+}
+
+.drop-zone .drop-label {
+  font-size: .76rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.drop-zone .drop-file-info {
+  font-size: .72rem;
+  color: var(--accent);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.drop-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INFO TOOLTIP
+   ═══════════════════════════════════════════════════════════════════ */
+
+.info-tooltip-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  position: relative;
+}
+
+.info-tooltip-trigger .info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  font-size: .6rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  transition: all .2s;
+  flex-shrink: 0;
+}
+
+.info-tooltip-trigger:hover .info-icon {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.info-tooltip-body {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 8px);
+  inset-inline-start: 0;
+  width: 260px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  font-size: .72rem;
+  line-height: 1.4;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  z-index: 100;
+}
+
+.info-tooltip-body.visible { display: block; }
+
+.info-tooltip-body::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  inset-inline-start: 16px;
+  border: 6px solid transparent;
+  border-top-color: var(--accent);
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    COLLAPSIBLE
@@ -546,4 +724,5 @@ details.collapsible > .card { margin-top: 8px; }
   .title-block h1 { font-size: 1rem; }
   .theme-bar { flex-wrap: wrap; }
   .theme-options { gap: 4px; }
+  .info-tooltip-body { width: 200px; }
 }
